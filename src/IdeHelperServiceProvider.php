@@ -12,6 +12,7 @@
 namespace Barryvdh\LaravelIdeHelper;
 
 use Barryvdh\LaravelIdeHelper\Compat\ServiceProviderCompatTrait;
+use Barryvdh\LaravelIdeHelper\Console\AllCommand;
 use Barryvdh\LaravelIdeHelper\Console\EloquentCommand;
 use Barryvdh\LaravelIdeHelper\Console\GeneratorCommand;
 use Barryvdh\LaravelIdeHelper\Console\MetaCommand;
@@ -78,8 +79,15 @@ class IdeHelperServiceProvider extends ServiceProvider
 
         $this->app->singleton(
             'command.ide-helper.eloquent',
-            function ($app) use ($localViewFactory) {
+            function ($app) {
                 return new EloquentCommand($app['files']);
+            }
+        );
+
+        $this->app->singleton(
+            'command.ide-helper.all',
+            function ($app) {
+                return new AllCommand();
             }
         );
 
@@ -87,7 +95,8 @@ class IdeHelperServiceProvider extends ServiceProvider
             'command.ide-helper.generate',
             'command.ide-helper.models',
             'command.ide-helper.meta',
-            'command.ide-helper.eloquent'
+            'command.ide-helper.eloquent',
+            'command.ide-helper.all'
         );
     }
 
@@ -102,7 +111,8 @@ class IdeHelperServiceProvider extends ServiceProvider
             'command.ide-helper.generate',
             'command.ide-helper.models',
             'command.ide-helper.meta',
-            'command.ide-helper.eloquent'
+            'command.ide-helper.eloquent',
+            'command.ide-helper.all',
         ];
     }
 
