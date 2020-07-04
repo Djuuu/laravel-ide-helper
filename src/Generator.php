@@ -85,7 +85,7 @@ class Generator
             ->with('namespaces_by_extends_ns', $this->getAliasesByExtendsNamespace())
             ->with('namespaces_by_alias_ns', $this->getAliasesByAliasNamespace())
             ->with('helpers', $this->helpers)
-            ->with('version', $app->version())
+            ->with('version', Application::VERSION)
             ->with('include_fluent', $this->config->get('ide-helper.include_fluent', true))
             ->with('factories', $this->config->get('ide-helper.include_factory_builders') ? Factories::all() : [])
             ->render();
@@ -120,7 +120,7 @@ class Generator
 
     protected function detectDrivers()
     {
-        $defaultUserModel = config('auth.providers.users.model', config('auth.model', 'App\User'));
+        $defaultUserModel = \Config::get('auth.providers.users.model', \Config::get('auth.model', 'App\User'));
         $this->interfaces['\Illuminate\Contracts\Auth\Authenticatable'] = $defaultUserModel;
 
         try {
@@ -128,7 +128,11 @@ class Generator
                 class_exists('Auth') && is_a('Auth', '\Illuminate\Support\Facades\Auth', true)
                 && app()->bound('auth')
             ) {
-                $class = get_class(\Auth::guard());
+                // L4 compat
+                // $class = get_class(\Auth::guard());
+                $authMethod = version_compare(Application::VERSION, '5.2', '>=') ? 'guard' : 'driver';
+                $class = get_class(\Auth::$authMethod());
+
                 $this->extra['Auth'] = array($class);
                 $this->interfaces['\Illuminate\Auth\UserProviderInterface'] = $class;
             }
