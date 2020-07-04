@@ -11,6 +11,7 @@
 
 namespace Barryvdh\LaravelIdeHelper\Console;
 
+use Barryvdh\LaravelIdeHelper\Compat\CommandCompatTrait;
 use Barryvdh\LaravelIdeHelper\Factories;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,6 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MetaCommand extends Command
 {
+    use CommandCompatTrait;
 
     /**
      * The console command name.

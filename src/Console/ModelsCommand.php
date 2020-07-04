@@ -11,6 +11,7 @@
 
 namespace Barryvdh\LaravelIdeHelper\Console;
 
+use Barryvdh\LaravelIdeHelper\Compat\CommandCompatTrait;
 use Barryvdh\Reflection\DocBlock;
 use Barryvdh\Reflection\DocBlock\Context;
 use Barryvdh\Reflection\DocBlock\Serializer as DocBlockSerializer;
@@ -36,6 +37,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ModelsCommand extends Command
 {
+    use CommandCompatTrait;
+
     /**
      * @var Filesystem $files
      */

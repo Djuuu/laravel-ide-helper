@@ -11,6 +11,7 @@
 
 namespace Barryvdh\LaravelIdeHelper\Console;
 
+use Barryvdh\LaravelIdeHelper\Compat\CommandCompatTrait;
 use Barryvdh\LaravelIdeHelper\Eloquent;
 use Barryvdh\LaravelIdeHelper\Generator;
 use Illuminate\Console\Command;
@@ -25,6 +26,7 @@ use Symfony\Component\Console\Input\InputArgument;
  */
 class GeneratorCommand extends Command
 {
+    use CommandCompatTrait;
 
     /**
      * The console command name.

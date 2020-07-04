@@ -11,6 +11,7 @@
 
 namespace Barryvdh\LaravelIdeHelper\Console;
 
+use Barryvdh\LaravelIdeHelper\Compat\CommandCompatTrait;
 use Barryvdh\LaravelIdeHelper\Eloquent;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -22,6 +23,8 @@ use Illuminate\Filesystem\Filesystem;
  */
 class EloquentCommand extends Command
 {
+    use CommandCompatTrait;
+
     /**
      * The console command name.
      *
