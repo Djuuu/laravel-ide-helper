@@ -16,7 +16,7 @@ use Barryvdh\Reflection\DocBlock;
 use Barryvdh\Reflection\DocBlock\Context;
 use Barryvdh\Reflection\DocBlock\Serializer as DocBlockSerializer;
 use Barryvdh\Reflection\DocBlock\Tag;
-use Composer\Autoload\ClassMapGenerator;
+use Symfony\Component\ClassLoader\ClassMapGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
@@ -125,9 +125,15 @@ class ModelsCommand extends Command
             }
         }
 
-        $this->dateClass = class_exists(\Illuminate\Support\Facades\Date::class)
-            ? '\\' . get_class(\Illuminate\Support\Facades\Date::now())
-            : '\Illuminate\Support\Carbon';
+        if (class_exists(\Illuminate\Support\Facades\Date::class)) {
+            $this->dateClass = '\\'.get_class(\Illuminate\Support\Facades\Date::now());
+        } elseif (class_exists('\Illuminate\Support\Carbon')) {
+            $this->dateClass = '\Illuminate\Support\Carbon';
+        } elseif (class_exists('\Carbon\Carbon')) {
+            $this->dateClass = '\Carbon\Carbon';
+        } else {
+            $this->dateClass = 'string';
+        }
 
         $content = $this->generateDocs($model, $ignore);
 
@@ -415,7 +421,7 @@ class ModelsCommand extends Command
                             $type = 'integer';
                             break;
                         case 'boolean':
-                            switch (config('database.default')) {
+                            switch (\Config::get('database.default')) {
                                 case 'sqlite':
                                 case 'mysql':
                                     $type = 'integer';
@@ -512,8 +518,10 @@ class ModelsCommand extends Command
                         $this->setMethod($name, $builder . '|' . $modelName, $args);
                     }
                 } elseif (in_array($method, ['query', 'newQuery', 'newModelQuery'])) {
-                    $builder = $this->getClassNameInModel($model, get_class($model->newModelQuery()));
 
+                    // L4 compat
+                    // $builder = $this->getClassNameInModel($model, get_class($model->newModelQuery()));
+                    $builder = $this->getClassNameInModel($model, get_class($model->newQueryWithoutScopes()));
                     $this->setMethod($method, $builder . "|" . $this->getClassNameInModel($model, get_class($model)));
                 } elseif (
                     !method_exists('Illuminate\Database\Eloquent\Model', $method)
@@ -646,6 +654,12 @@ class ModelsCommand extends Command
         $reflectionObj = new ReflectionObject($relationObj);
 
         if (in_array($relation, ['hasOne', 'hasOneThrough', 'morphOne'], true)) {
+
+            // L4 compat
+            if (!$reflectionObj->hasProperty('withDefault')) {
+                return true;
+            }
+
             $defaultProp = $reflectionObj->getProperty('withDefault');
             $defaultProp->setAccessible(true);
 
