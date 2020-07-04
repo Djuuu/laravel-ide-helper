@@ -11,6 +11,7 @@
 
 namespace Barryvdh\LaravelIdeHelper;
 
+use Barryvdh\LaravelIdeHelper\Compat\ServiceProviderCompatTrait;
 use Barryvdh\LaravelIdeHelper\Console\EloquentCommand;
 use Barryvdh\LaravelIdeHelper\Console\GeneratorCommand;
 use Barryvdh\LaravelIdeHelper\Console\MetaCommand;
@@ -23,6 +24,7 @@ use Illuminate\View\FileViewFinder;
 
 class IdeHelperServiceProvider extends ServiceProvider
 {
+    use ServiceProviderCompatTrait;
 
     /**
      * Indicates if loading of the provider is deferred.
@@ -38,18 +40,8 @@ class IdeHelperServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app->has('view')) {
-            $viewPath = __DIR__ . '/../resources/views';
-            $this->loadViewsFrom($viewPath, 'ide-helper');
-        }
-
-        $configPath = __DIR__ . '/../config/ide-helper.php';
-        if (function_exists('config_path')) {
-            $publishPath = config_path('ide-helper.php');
-        } else {
-            $publishPath = base_path('config/ide-helper.php');
-        }
-        $this->publishes([$configPath => $publishPath], 'config');
+        $viewPath = __DIR__ . '/../resources/views';
+        $this->loadViewsFrom($viewPath, 'ide-helper');
     }
 
     /**
@@ -106,7 +98,12 @@ class IdeHelperServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('command.ide-helper.generate', 'command.ide-helper.models');
+        return [
+            'command.ide-helper.generate',
+            'command.ide-helper.models',
+            'command.ide-helper.meta',
+            'command.ide-helper.eloquent'
+        ];
     }
 
     /**
